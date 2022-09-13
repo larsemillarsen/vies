@@ -5,16 +5,16 @@ Created on Tue Feb 11 14:32:46 2020
 @author: llarsen
 """
 
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal as signal
 import os
 import sys
 
-sys.path.insert(1, r'C:\Users\llarsen\OneDrive - ugentbe\python_functions')
-from vies.f_curry import *
+parent_dir = os.path.dirname(os.path.abspath('..'))
+sys.path.append(parent_dir)
 
-
+from vies.parse.neuron import load_neuronfile
+from vies.lfp.filter import butter_bandpass_filter
 
 
 

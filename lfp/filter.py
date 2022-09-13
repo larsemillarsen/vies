@@ -1,8 +1,6 @@
-from scipy.signal import butter, filtfilt, decimate, blackmanharris, detrend, gaussian
+from scipy.signal import butter, filtfilt, gaussian
 import numpy as np
-from scipy.io import loadmat
-import h5py
-import math
+
 
 def butter_lowpass(cutOff, fs, order=2):
     nyq = 0.5 * fs

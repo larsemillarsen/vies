@@ -1,6 +1,4 @@
-import sys
-sys.path.insert(1, r'C:\Users\llarsen\OneDrive - ugentbe\python_functions')
-#from vies.f_curry import *
+
 import numpy as np
 import h5py
 

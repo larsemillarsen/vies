@@ -5,10 +5,7 @@ Created on Tue May 19 17:02:57 2020
 @author: llarsen
 """
 
-import os
 import numpy as np
-import sys
-sys.path.insert(1, r'C:\Users\llarsen\OneDrive - ugentbe\python_functions')
 
 def compute_autocorrelogram(data, binsize, window):
   

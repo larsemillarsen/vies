@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-
+import os
 import numpy as np
 import sys
-sys.path.insert(1, r'C:\Users\llarsen\OneDrive - ugentbe\python_functions')
-from vies.f_curry import movingaverage, gaussian_smooth
-
+parent_dir = os.path.dirname(os.path.abspath('..'))
+sys.path.append(parent_dir)
+from vies.lfp.filter import movingaverage, gaussian_smooth
 
 def extract_frequency_bins(spiketimes, bin_size, start, stop, **kwargs):
     '''
@@ -37,9 +37,9 @@ def extract_frequency_bins(spiketimes, bin_size, start, stop, **kwargs):
     
     if smooth_method == 'moving_average':
         spike_count = movingaverage(spike_count,smooth_window)                
-#    elif smooth_method == 'gaussian':
-#        smooth_sigma = kwargs.get('smooth_sigma', 2)
-#        spike_count = gaussian_smooth(spike_count,smooth_window, smooth_sigma)                
+    elif smooth_method == 'gaussian':
+        smooth_sigma = kwargs.get('smooth_sigma', 2)
+        spike_count = gaussian_smooth(spike_count,smooth_window, smooth_sigma)                
     elif smooth_method == 'none':
         pass
     

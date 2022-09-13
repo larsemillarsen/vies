@@ -5,12 +5,8 @@ Created on Mon Sep 12 16:55:19 2022
 @author: User
 """
 
-import os
 import numpy as np
-import matplotlib.pyplot as plt
-import sys
-sys.path.insert(1, r'C:\Users\User\OneDrive - UGent\python_functions')
-
+from scipy.signal import blackmanharris, detrend
 
 def spectrogram(data, srate, windowlength=1, overlap=0.5, highfreq=100):
     window = windowlength * srate
@@ -37,7 +33,6 @@ def spectrogram(data, srate, windowlength=1, overlap=0.5, highfreq=100):
     w_data = w_data[0:int(highfreq+1), :]
 
     return time, frequencies, w_data
-
 
 def linelenght(data, srate, start, stop):
     # this outputs the linelength of a signal

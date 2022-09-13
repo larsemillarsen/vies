@@ -8,10 +8,6 @@ Created on Mon Sep 12 16:54:21 2022
 import numpy as np
 from scipy.io import loadmat
 
-import sys
-sys.path.insert(1, r'C:\Users\User\OneDrive - UGent\python_functions')
-
-
 def load_neuronfile(path, srate, channel, gain, inputrange):
     data = loadmat(path)
     data = data['Meting']['adc'][0][0][:,channel-1]*(inputrange/(2**16))

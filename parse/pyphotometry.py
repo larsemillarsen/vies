@@ -6,12 +6,10 @@ Created on Mon Mar 28 18:22:55 2022
 """
 
 import numpy as np
-import sys
 import pandas as pd
 import json
 from scipy.signal import butter, filtfilt
 
-sys.path.insert(1, r'C:\Users\llarsen\OneDrive - ugentbe\python_functions')
 
 
 

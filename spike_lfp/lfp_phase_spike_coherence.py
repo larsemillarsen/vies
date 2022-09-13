@@ -5,21 +5,15 @@ Created on Mon Nov 29 15:30:55 2021
 @author: Lars
 """
 
-import sys
-sys.path.insert(1, r'E:\OneDrive - UGent\python_functions')
-
 import os
+import sys
+parent_dir = os.path.dirname(os.path.abspath('..'))
+sys.path.append(parent_dir)
+
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy.signal import resample, hilbert
-
+from scipy.signal import hilbert
 from math import pi
-import math
-import OpenEphys as OE
-
-from vies.f_curry import butter_bandpass_filter
-from vies.phy_analysis import phy_data
-from vies.f_curry import round_nearest
+from vies.general.general import round_nearest
 
 
 def spike_lfp_radians(filtered_lfp, srate_lfp, lfp_offset, spike_train):
