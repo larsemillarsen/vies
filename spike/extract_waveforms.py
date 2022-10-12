@@ -33,14 +33,22 @@ def extract_waveforms(data, srate, n_channels, spike_times, window, channels):
     
     N_t = int(N_t * srate * 1e-3)
     
+    #print(type(channels), type(spike_times))
     if isinstance(channels, (int, np.uint32)) and isinstance(spike_times, (int, np.uint32)):
         stas = np.zeros((N_t, 1, 1), dtype=np.float32)
+
+    elif isinstance(channels, (int, np.int64)) and isinstance(spike_times, (np.ndarray, list)):
+        stas = np.zeros((N_t, 1, len(spike_times)), dtype=np.float32)
+        
     elif isinstance(channels, (int, np.uint32)) and isinstance(spike_times, (np.ndarray, list)):
         stas = np.zeros((N_t, 1, len(spike_times)), dtype=np.float32)
+        
     elif isinstance(channels, np.ndarray) and isinstance(spike_times, (int, np.uint32)):
         stas = np.zeros((N_t, len(channels), 1), dtype=np.float32)
+        
     elif isinstance(channels, (np.ndarray, list)) and isinstance(spike_times, (np.ndarray, list)):
             stas = np.zeros((N_t, len(channels), len(spike_times)), dtype=np.float32)
+
     duration = N_t
     offset = duration // 2
     
@@ -60,6 +68,8 @@ def extract_waveforms(data, srate, n_channels, spike_times, window, channels):
             local_chunk = np.array(data_file[start:stop, channels]).astype(np.float)
             if isinstance(channels, (np.uint32, int)):
                 stas[:,0,count] = local_chunk
+            elif isinstance(channels, (np.int64, int)):
+                stas[:,0,count] = local_chunk                
             else:
                 stas[:,:,count] = local_chunk
             count += 1

@@ -11,9 +11,7 @@ import json
 from scipy.signal import butter, filtfilt
 
 
-
-
-def open_pyphotometry_csv(path, analog_channels, digital_channels, srate=130, delimiter=','):
+def open_pyphotometry_csv(path, analog_channels, digital_channels, srate=130, delimiter=',', low_pass=2 , high_pass=0.001, f_type = 'bandpass'):
     
     data = pd.read_csv(path, delimiter=delimiter, index_col=False)
     
@@ -27,16 +25,27 @@ def open_pyphotometry_csv(path, analog_channels, digital_channels, srate=130, de
         digital_channels[i] = digital_channels[i] + 1
     
     analog = np.array(data.iloc[:,analog_channels], dtype=int)
-
+    analog_filtered = np.array(data.iloc[:,analog_channels], dtype=int)
+    
     digital = np.array(data.iloc[:,digital_channels], dtype=int)
+
+    if f_type=='bandpass':
+        b, a = butter(2, np.array([high_pass, low_pass])/(0.5*srate), 'bandpass')
+    elif f_type=='low_pass':
+        b, a = butter(2, low_pass/(0.5*srate), 'low')
+    elif f_type=='high_pass':
+        b, a = butter(2, high_pass/(0.5*srate), 'high')
+
+    for i in range(np.shape(analog)[1]):            
+        analog_filtered[:,i] = filtfilt(b, a, analog[:,i])
     
     dt = 1/srate
     time = np.arange(0, np.shape(analog)[0]/srate, dt)
     
-    return time, np.squeeze(analog), np.squeeze(digital)
+    return time, np.squeeze(analog), np.squeeze(digital), np.squeeze(analog_filtered)
 
 
-def import_ppd(file_path, low_pass=20, high_pass=0.01):
+def import_ppd(file_path, low_pass=2, high_pass=0.001, f_type = 'bandpass'):
     '''Function to import pyPhotometry binary data files into Python. The high_pass 
     and low_pass arguments determine the frequency in Hz of highpass and lowpass 
     filtering applied to the filtered analog signals. To disable highpass or lowpass
@@ -78,17 +87,28 @@ def import_ppd(file_path, low_pass=20, high_pass=0.01):
     digital_2 = digital[1::2]
     time = np.arange(analog_1.shape[0])/sampling_rate # Time relative to start of recording (ms).
     # Filter signals with specified high and low pass frequencies (Hz).
-    if low_pass and high_pass:
+
+    if f_type=='bandpass':
         b, a = butter(2, np.array([high_pass, low_pass])/(0.5*sampling_rate), 'bandpass')
-    elif low_pass:
+    elif f_type=='low_pass':
         b, a = butter(2, low_pass/(0.5*sampling_rate), 'low')
-    elif high_pass:
+    elif f_type=='high_pass':
         b, a = butter(2, high_pass/(0.5*sampling_rate), 'high')
-    if low_pass or high_pass:
-        analog_1_filt = filtfilt(b, a, analog_1)
-        analog_2_filt = filtfilt(b, a, analog_2)
-    else:
-        analog_1_filt = analog_2_filt = None
+    
+    analog_1_filt = filtfilt(b, a, analog_1)
+    analog_2_filt = filtfilt(b, a, analog_2)
+            
+    #if low_pass and high_pass:
+    #    b, a = butter(2, np.array([high_pass, low_pass])/(0.5*sampling_rate), 'bandpass')
+    #elif low_pass:
+    #    b, a = butter(2, low_pass/(0.5*sampling_rate), 'low')
+    #elif high_pass:
+    #    b, a = butter(2, high_pass/(0.5*sampling_rate), 'high')
+    #if low_pass or high_pass:
+    #    analog_1_filt = filtfilt(b, a, analog_1)
+    #    analog_2_filt = filtfilt(b, a, analog_2)
+    #else:
+    #    analog_1_filt = analog_2_filt = None
     # Extract rising edges for digital inputs.
     pulse_inds_1 = 1+np.where(np.diff(digital_1) == 1)[0]
     pulse_inds_2 = 1+np.where(np.diff(digital_2) == 1)[0]

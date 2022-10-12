@@ -8,6 +8,7 @@ sys.path.append(parent_dir)
 
 from vies.lfp.filter import movingaverage, gaussian_smooth
 import numpy as np
+import pandas as pd
 
 
 class phy_data:    
@@ -17,6 +18,10 @@ class phy_data:
         self.templates = np.load(os.path.join(directory,'spike_clusters.npy'))
         self.amplitudes = np.load(os.path.join(directory,'amplitudes.npy'))
         self.srate = srate
+        channels = pd.read_csv(os.path.join(directory,'cluster_info.tsv'), sep='\t')['ch']
+        template_id = pd.read_csv(os.path.join(directory,'cluster_info.tsv'), sep='\t')['cluster_id']
+        self.template_info = np.array([channels, template_id]).T
+        self.channel_coordinates = np.load(os.path.join(directory,'channel_positions.npy'))
         return
 
     def extract_frequency_bins(self, bin_size, start, stop, **kwargs):
@@ -56,7 +61,8 @@ class phy_data:
                 spike_count[:,counter] = spike_count[:,counter] / bin_size
                 counter = counter + 1
                 
-        elif isinstance(templates, int) == True:  
+        elif isinstance(templates, int) == True:
+
             n_templates = templates
             template_id = templates
             index = [i for i, x in enumerate(list(self.templates)) if x == n_templates] # gets index of all matching values in templates
@@ -64,7 +70,7 @@ class phy_data:
             spike_count = np.histogram(spiketimes, n_bins, (start, stop))[0] 
             spike_count = spike_count / bin_size
         elif isinstance(templates, list) == True:
-            #print('test')
+            print('test')
             n_templates = len(templates)
             template_id = templates
             spike_count = np.zeros((n_bins, n_templates))
@@ -107,9 +113,21 @@ class phy_data:
     
     def extract_spike_trains(self, template_id):
         template = template_id
-        index = [i for i, x in enumerate(list(self.templates)) if x == template] # gets index of all matching values in templates
-        spiketimes = self.times[index]/self.srate
+        if isinstance(template, int):
+            index = [i for i, x in enumerate(list(self.templates)) if x == template] # gets index of all matching values in templates
+            spiketimes = self.times[index]/self.srate
+        elif isinstance(template, list):
+            spiketimes = [None] * len(template)
+            for k in range(len(template)):
+                index = [i for i, x in enumerate(list(self.templates)) if x == template[k]]
+                spiketimes[k] = self.times[index]/self.srate
+                    
+        return spiketimes
+    
+    def compute_channel_distances(self):
+        distances = 0
         
-        return spiketimes     
+        return distances
+        
 
     
